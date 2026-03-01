@@ -26,16 +26,21 @@ Ein klassisches, robustes ERP-Schema umfasst:
 
 ### 2. Der "Smart-Transaction-Flow"
 Jede Anfrage durchläuft folgenden Prozess:
-1.  **Omnichannel-Input:** Sprachnachricht oder Text-Prompt via **Web-Frontend, WhatsApp oder Telegram**.
-2.  **Transkription & Analyse:** Verarbeitung durch Azure AI Foundry Bausteine (Whisper für Voice-to-Text).
-3.  **Klassifizierung:** Zuordnung der Anfrage zu einem konkreten **Business Case** (z. B. "Zeiterfassung", "Materialbuchung").
-4.  **Validierung (Security & Roles):** Prüfung der Zulässigkeit basierend auf der verknüpften Identität (z. B. Telefonnummer in WhatsApp).
-5.  **Daten-Vervollständigung:** Interaktive Rückfrage über denselben Kanal (z. B. WhatsApp Antwort), falls Informationen fehlen.
+1.  **Omnichannel-Input:** Sprachnachricht, Text-Prompt oder **Bilder** (z. B. Foto eines Lieferscheins oder Schadens) via Web-Frontend, WhatsApp oder Telegram.
+2.  **Multimodale Analyse:** 
+    *   **Voice:** Transkription via Azure AI (Whisper).
+    *   **Bilder:** OCR & Dokumentenanalyse (Azure AI Vision) zur Datenextraktion (z. B. Mengen vom Lieferschein) oder zur rein visuellen Dokumentation.
+3.  **Klassifizierung:** Zuordnung der Anfrage zu einem konkreten **Business Case** (z. B. "Wareneingang buchen" bei Lieferschein-Foto).
+4.  **Validierung (Security & Roles):** Prüfung der Zulässigkeit basierend auf der verknüpften Identität.
+5.  **Daten-Vervollständigung:** Interaktive Rückfrage über denselben Kanal, falls Informationen fehlen.
 6.  **Ausführung:** Finale Buchung in die Datenbank erst bei Vollständigkeit.
 
-### 3. Rollenkonzept
-- **User-Rolle:** Ausführung von zugewiesenen Business-Cases (z. B. "Arbeitszeit von heute loggen").
-- **Creator-Rolle:** Anpassung und Erstellung neuer Usecases – ebenfalls via Prompt-Interface.
+### 3. Rollenkonzept & Dynamische Prozesse
+- **User-Rolle:** Ausführung von zugewiesenen Business-Cases (z. B. "Arbeitszeit loggen", "Schaden melden mit Foto").
+- **Creator-Rolle:** 
+    *   **Prozess-Design:** Erstellung und Modifikation von Smart-Transaction-Flows per natürlicher Sprache.
+    *   **Customizing:** Anpassung der Standard-Usecases an die spezifischen Bedürfnisse des Handwerksbetriebs.
+    *   **Logik-Steuerung:** Festlegen, welche Daten für eine "vollständige" Transaktion zwingend nötig sind.
 
 ---
 
