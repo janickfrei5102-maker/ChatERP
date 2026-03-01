@@ -26,14 +26,14 @@ Ein klassisches, robustes ERP-Schema umfasst:
 
 ### 2. Der "Smart-Transaction-Flow"
 Jede Anfrage durchläuft folgenden Prozess:
-1.  **Omnichannel-Input:** Sprachnachricht, Text-Prompt oder **Bilder** (z. B. Foto eines Lieferscheins oder Schadens) via Web-Frontend, WhatsApp oder Telegram.
-2.  **Multimodale Analyse:** 
-    *   **Voice:** Transkription via Azure AI (Whisper).
-    *   **Bilder:** OCR & Dokumentenanalyse (Azure AI Vision) zur Datenextraktion (z. B. Mengen vom Lieferschein) oder zur rein visuellen Dokumentation.
-3.  **Klassifizierung:** Zuordnung der Anfrage zu einem konkreten **Business Case** (z. B. "Wareneingang buchen" bei Lieferschein-Foto).
-4.  **Validierung (Security & Roles):** Prüfung der Zulässigkeit basierend auf der verknüpften Identität.
-5.  **Daten-Vervollständigung:** Interaktive Rückfrage über denselben Kanal, falls Informationen fehlen.
-6.  **Ausführung:** Finale Buchung in die Datenbank erst bei Vollständigkeit.
+1.  **Omnichannel-Input:** Sprachnachricht, Text-Prompt oder **Bilder** via Web-Frontend, WhatsApp oder Telegram.
+2.  **Multimodale Analyse:** Whisper für Voice, Azure AI Vision für Bilder (OCR/Doku).
+3.  **Intelligente Klassifizierung & Context Retrieval:**
+    *   **Probabilistisches Routing:** Ist die Absicht (Intent) unklar, analysiert das System die wahrscheinlichsten Business-Cases und bietet dem User Optionen zur Auswahl an.
+    *   **Data-Driven Inference:** Das System zieht Informationen aus der Datenbank (z. B. **Personalplanung/Einsatzplan**), um kontextuelle Infos selbst abzuleiten (z. B. *"Du warst laut Plan heute bei Sanitäts-Müller, soll ich die 4h dort buchen?"*).
+4.  **Validierung (Security & Roles):** Prüfung der Zulässigkeit basierend auf der Identität und dem Rollenmodell.
+5.  **Interaktive Vervollständigung:** Gezielte Rückfragen bei fehlenden Pflichtfeldern oder zur Bestätigung von Annahmen.
+6.  **Ausführung:** Finale Transaktion in der Azure SQL DB erst nach expliziter oder impliziter Bestätigung.
 
 ### 3. Rollenkonzept & Dynamische Prozesse
 - **User-Rolle:** Ausführung von zugewiesenen Business-Cases (z. B. "Arbeitszeit loggen", "Schaden melden mit Foto").
