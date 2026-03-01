@@ -61,15 +61,14 @@ Jede Anfrage durchläuft folgenden Prozess:
 
 ### 3. Rollenkonzept & Dynamische Prozesse
 - **User-Rolle:** Ausführung von zugewiesenen Prozessen (Schreiben, Lesen, Dokumente initiieren). Jede Rolle hat Zugriff auf spezifische STFs.
-- **Creator-Rolle:** 
-    *   **Prozess-Design:** Definition von STFs per Sprache (Schema, Berechtigungen, Logik).
-    *   **Governance:** Überwachung und Anpassung der Prozess-Leitplanken.
+- **Creator-Rolle (Advanced AI Governance):** 
+    *   **STF-Management:** Erstellung, Modifikation und Löschung von Smart Transaction Flows per Prompt.
+    *   **Schema-Evolution:** Modifikation der ERP-Datenbankstruktur (neue Tabellen, zusätzliche Spalten) via natürlicher Sprache.
+    *   **Integrity Guard:** Überwachung der Systemintegrität bei Änderungen.
 
 ---
 
-## ⚙️ Detail-Spezifikation: Smart Transaction Flow (STF)
-
-Die STFs sind das Herzstück von ChatERP. Sie bilden die kontrollierte Brücke zwischen Sprache und Datenbank. Jeder STF wird in einer dedizierten Tabelle gespeichert.
+## ⚙️ Detail-Spezifikation: Smart Transaction Flow (STF) & Evolution
 
 ### 1. Datenmodell der STF-Tabelle
 | Feld | Typ | Beschreibung |
@@ -84,17 +83,20 @@ Die STFs sind das Herzstück von ChatERP. Sie bilden die kontrollierte Brücke z
 | **ValidationRules** | JSON | Business-Logik (z. B. `{"MinDauer": 0.25, "MaxDauer": 12}`). |
 
 ### 2. Der STF-Lifecycle (Deterministischer Ablauf)
+1.  **Klassifizierung & Autorisierung:** Intent-Erkennung und Rollenprüfung.
+2.  **Slot-Filling:** Extraktion aus Prompt + kontextuelle Ableitung aus der DB.
+3.  **Interaktive Klärung:** Rückfragen bei fehlenden Pflicht-Informationen.
+4.  **Finalisierung:** Ausführung der Transaktion / Abfrage / Dokumentenerstellung.
 
-1.  **Klassifizierung & Autorisierung:**
-    *   System erkennt den Intent aus Sprache/Text/Bild.
-    *   Prüfung: Ist die Rolle des anfragenden Users in `AllowedRoles` enthalten? Falls nein: Abbruch mit Hinweis.
-2.  **Slot-Filling (Kontextuelle Intelligenz):**
-    *   **Extraktion:** Daten direkt aus dem Prompt ziehen.
-    *   **Inference:** Fehlende Daten aus der DB ableiten (z. B. aus der Einsatzplanung des Mitarbeiters).
-3.  **Interaktive Klärung:**
-    *   Das System fragt gezielt nach fehlenden Slots, für die keine Ableitung möglich ist.
-4.  **Finalisierung:**
-    *   Sobald alle Pflicht-Informationen vorhanden sind, wird die Transaktion / Abfrage / Dokumentenerstellung ausgeführt.
+### 3. Evolutionary Logic & Dependency Check
+Wenn der Creator das Schema oder die STFs verändert (z. B. neue Spalten hinzufügen), führt das System eine **Impact-Analyse** durch:
+1.  **Dependency Discovery:** Prüfung aller STFs auf Abhängigkeiten zur betroffenen Struktur.
+2.  **Conflict Reporting:** Identifikation von "Breaking Changes".
+3.  **Resilience-Optionen:** 
+    *   **Auto-Update:** Automatische Anpassung der betroffenen STFs.
+    *   **Mapping:** Virtuelles Mapping alter Logik auf neue Felder.
+    *   **Guided Refactoring:** Anleitung zur manuellen Korrektur.
+    *   **Rollback:** Sicherer Rückzug bei hohem Risiko.
 
 ---
 
