@@ -5,7 +5,7 @@
 ---
 
 ## 🏗️ Die Vision
-Mitarbeiter im Feld (z. B. auf der Baustelle) bedienen das ERP per Sprachnachricht in ihrer Muttersprache. Das System versteht die Instruktion, ordnet sie einem deterministischen Business-Case zu und führt die Transaktion sicher aus.
+Mitarbeiter im Feld (z. B. auf der Baustelle) bedienen das ERP per Sprachnachricht in ihrer Muttersprache. Das System versteht die Instruktion, ordnet sie einem deterministischen Business-Case zu und führt die Transaktion sicher aus. Das system ist ein Governance layer zwischen den unmittelbaren Bedürfnissen der User im Feld und der abstrakten Datenstruktur im Hintergrund.
 
 ### Kern-USP:
 - **Voice-First:** Primäre Interaktion über Sprachnachrichten (Transkription via Azure AI).
@@ -26,7 +26,7 @@ Ein klassisches, robustes ERP-Schema umfasst:
 
 ### 2. Der "Smart-Transaction-Flow"
 Jede Anfrage durchläuft folgenden Prozess:
-1.  **Omnichannel-Input:** Sprachnachricht, Text-Prompt oder **Bilder** via Web-Frontend, WhatsApp oder Telegram.
+1.  **Omnichannel-Input:** Sprachnachricht, Text-Prompt oder **Bilder** via Web-Frontend, WhatsApp, **MS Teams** oder Telegram.
 2.  **Multimodale Analyse:** Whisper für Voice, Azure AI Vision für Bilder (OCR/Doku).
 3.  **Intelligente Klassifizierung & Context Retrieval:**
     *   **Probabilistisches Routing:** Analyse der wahrscheinlichsten Business-Cases bei Unklarheit.
@@ -39,11 +39,43 @@ Jede Anfrage durchläuft folgenden Prozess:
     *   **Dokumentenerstellung:** Generierung von DocX, PDF oder E-Mail-Entwürfen (z. B. *"Erstelle ein Angebot für Müller"*).
 
 ### 3. Rollenkonzept & Dynamische Prozesse
-- **User-Rolle:** Ausführung von zugewiesenen Prozessen (Schreiben, Lesen, Dokumente initiieren).
+- **User-Rolle:** Ausführung von zugewiesenen Prozessen (Schreiben, Lesen, Dokumente initiieren). Jede Rolle hat Zugriff auf spezifische STFs.
 - **Creator-Rolle:** 
-    *   **Prozess-Design:** Definition von Schreib-, Lese- und Dokumentenflows per Sprache.
-    *   **Customizing:** Anpassung der Standard-Usecases.
-    *   **Logik-Steuerung:** Definition von Pflichtfeldern und automatisierten Ableitungsregeln.
+    *   **Prozess-Design:** Definition von STFs per Sprache (Schema, Berechtigungen, Logik).
+    *   **Governance:** Überwachung und Anpassung der Prozess-Leitplanken.
+
+---
+
+## ⚙️ Detail-Spezifikation: Smart Transaction Flow (STF)
+
+Die STFs sind das Herzstück von ChatERP. Sie bilden die kontrollierte Brücke zwischen Sprache und Datenbank. Jeder STF wird in einer dedizierten Tabelle gespeichert.
+
+### 1. Datenmodell der STF-Tabelle
+| Feld | Typ | Beschreibung |
+| :--- | :--- | :--- |
+| **FlowID** | UUID | Eindeutiger Identifikator des Prozesses. |
+| **Name** | String | Kurzer Name (z. B. "Zeiterfassung_Mitarbeiter"). |
+| **AllowedRoles** | JSON/Array | Liste der Rollen, die diesen Flow auslösen dürfen (z. B. `["Monteur", "Chef"]`). |
+| **IntentDescription** | Text | Beschreibung für die KI, um den Input diesem Flow zuzuweisen. |
+| **ActionType** | Enum | `TRANSACTION` (Write), `QUERY` (Read), `DOCUMENT` (Output). |
+| **TargetEntity** | String | Ziel-Tabelle in der ERP-Datenbank (z. B. `TimeLogs`). |
+| **Slots (RequiredFields)** | JSON | Definition der benötigten Datenfelder: Typ, Pflichtfeld-Status & Herkunft (z. B. `{"Dauer": "float", "Projekt": "DB_Lookup"}`). |
+| **ValidationRules** | JSON | Business-Logik (z. B. `{"MinDauer": 0.25, "MaxDauer": 12}`). |
+
+### 2. Der STF-Lifecycle (Deterministischer Ablauf)
+
+1.  **Klassifizierung & Autorisierung:**
+    *   System erkennt den Intent aus Sprache/Text/Bild.
+    *   Prüfung: Ist die Rolle des anfragenden Users in `AllowedRoles` enthalten? Falls nein: Abbruch mit Hinweis.
+2.  **Slot-Filling (Kontextuelle Intelligenz):**
+    *   **Extraktion:** Daten direkt aus dem Prompt ziehen.
+    *   **Inference:** Fehlende Daten aus der DB ableiten (z. B. aus der Einsatzplanung des Mitarbeiters).
+3.  **Interaktive Klärung:**
+    *   Das System fragt gezielt nach fehlenden Slots, für die keine Ableitung möglich ist.
+4.  **Finalisierung:**
+    *   Sobald alle Pflicht-Informationen vorhanden sind, wird die Transaktion / Abfrage / Dokumentenerstellung ausgeführt.
+
+---
 
 ---
 
@@ -52,10 +84,10 @@ Jede Anfrage durchläuft folgenden Prozess:
 | Komponente | Technologie |
 | :--- | :--- |
 | **Hosting & Cloud** | Azure App Service |
-| **Messaging / Bots** | **Azure Bot Service** (Connectivity für WhatsApp/Telegram) |
+| **Messaging / Bots** | **Azure Bot Service** (Connectivity für WhatsApp/Teams/Telegram) |
 | **Datenbank** | Azure SQL Database |
 | **KI / NLP / Speech** | Azure AI Foundry (Speech-to-Text, Azure OpenAI) |
-| **Backend** | Python (FastAPI / LangGraph für deterministische Flows) |
+| **Logic-Engine** | Python (FastAPI / LangGraph für die STF-Steuerung) |
 | **Frontend** | Web-App (React / Vite) & Messaging-Clients |
 | **Output-Engine** | Module zur Erzeugung von DocX & automatisierten E-Mails |
 
