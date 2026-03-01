@@ -26,15 +26,15 @@ Ein klassisches, robustes ERP-Schema umfasst:
 
 ### 2. Der "Smart-Transaction-Flow"
 Jede Anfrage durchläuft folgenden Prozess:
-1.  **Input:** Sprachnachricht oder Text-Prompt via Web-Frontend (z. B. *"Ich habe heute 4 Stunden bei Kunde Müller gearbeitet"*).
-2.  **Transkription & Analyse:** Verarbeitung durch Azure AI Foundry Bausteine.
-3.  **Klassifizierung:** Zuordnung der Anfrage zu einem konkreten **Business Case** (hier: "Zeiterfassung").
-4.  **Validierung (Security & Roles):** Prüfung der Zulässigkeit (Darf dieser User Zeiten für den genannten Kunden loggen?).
-5.  **Daten-Vervollständigung:** Identifikation fehlender Informationen (z. B. *"Welche Tätigkeit wurde ausgeführt?"*).
+1.  **Omnichannel-Input:** Sprachnachricht oder Text-Prompt via **Web-Frontend, WhatsApp oder Telegram**.
+2.  **Transkription & Analyse:** Verarbeitung durch Azure AI Foundry Bausteine (Whisper für Voice-to-Text).
+3.  **Klassifizierung:** Zuordnung der Anfrage zu einem konkreten **Business Case** (z. B. "Zeiterfassung", "Materialbuchung").
+4.  **Validierung (Security & Roles):** Prüfung der Zulässigkeit basierend auf der verknüpften Identität (z. B. Telefonnummer in WhatsApp).
+5.  **Daten-Vervollständigung:** Interaktive Rückfrage über denselben Kanal (z. B. WhatsApp Antwort), falls Informationen fehlen.
 6.  **Ausführung:** Finale Buchung in die Datenbank erst bei Vollständigkeit.
 
 ### 3. Rollenkonzept
-- **User-Rolle:** Ausführung von zugewiesenen Business-Cases (z. B. "Material für Auftrag X verbuchen").
+- **User-Rolle:** Ausführung von zugewiesenen Business-Cases (z. B. "Arbeitszeit von heute loggen").
 - **Creator-Rolle:** Anpassung und Erstellung neuer Usecases – ebenfalls via Prompt-Interface.
 
 ---
@@ -44,10 +44,11 @@ Jede Anfrage durchläuft folgenden Prozess:
 | Komponente | Technologie |
 | :--- | :--- |
 | **Hosting & Cloud** | Azure App Service |
+| **Messaging / Bots** | **Azure Bot Service** (Connectivity für WhatsApp/Telegram) |
 | **Datenbank** | Azure SQL Database |
 | **KI / NLP / Speech** | Azure AI Foundry (Speech-to-Text, Azure OpenAI) |
 | **Backend** | Python (FastAPI / LangGraph für deterministische Flows) |
-| **Frontend** | Web-App (React / Vite) mit nativen Audio-Web-APIs |
+| **Frontend** | Web-App (React / Vite) & Messaging-Clients |
 | **Output-Engine** | Module zur Erzeugung von DocX & automatisierten E-Mails |
 
 ---
