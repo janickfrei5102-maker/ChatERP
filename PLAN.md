@@ -22,16 +22,16 @@ Ein klassisches, robustes ERP-Schema umfasst:
 - **CRM:** Kunden, Firmen, Lieferanten & Interaktionshistorie.
 - **Finanzen:** Rechnungen & Belege.
 - **Warenwirtschaft:** Produkte, Produktgruppen & Lagerbestand.
-- **HR:** Personalplanung & Rollen.
+- **HR & Zeit:** Personalplanung, Rollen & **Zeit-Rapportierung** (Arbeitszeiterfassung, Projektabrechnung).
 
 ### 2. Der "Smart-Transaction-Flow"
 Jede Anfrage durchläuft folgenden Prozess:
-1.  **Input:** Sprachnachricht oder Text-Prompt via Web-Frontend.
+1.  **Input:** Sprachnachricht oder Text-Prompt via Web-Frontend (z. B. *"Ich habe heute 4 Stunden bei Kunde Müller gearbeitet"*).
 2.  **Transkription & Analyse:** Verarbeitung durch Azure AI Foundry Bausteine.
-3.  **Klassifizierung:** Zuordnung der Anfrage zu einem konkreten **Business Case**.
-4.  **Validierung (Security & Roles):** Prüfung der Zulässigkeit (Darf dieser User das tun?).
-5.  **Daten-Vervollständigung:** Identifikation fehlender Informationen (Rückfrage an den User, falls nötig).
-6.  **Ausführung:** Finale Transaktion (Datenanlage/Pflege) erst bei Vollständigkeit.
+3.  **Klassifizierung:** Zuordnung der Anfrage zu einem konkreten **Business Case** (hier: "Zeiterfassung").
+4.  **Validierung (Security & Roles):** Prüfung der Zulässigkeit (Darf dieser User Zeiten für den genannten Kunden loggen?).
+5.  **Daten-Vervollständigung:** Identifikation fehlender Informationen (z. B. *"Welche Tätigkeit wurde ausgeführt?"*).
+6.  **Ausführung:** Finale Buchung in die Datenbank erst bei Vollständigkeit.
 
 ### 3. Rollenkonzept
 - **User-Rolle:** Ausführung von zugewiesenen Business-Cases (z. B. "Material für Auftrag X verbuchen").
