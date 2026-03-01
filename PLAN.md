@@ -45,6 +45,10 @@ Das Schema ist relational und auf Integrität ausgelegt. Es dient als Fundament 
 - **Attachments:** `AttachmentID`, `EntityID` (Link zu Projekt/Schaden), `BlobURL`, `MediaType` (Image/PDF), `OcrResultText`.
 - **SmartTransactionFlows (STF):** *(Siehe Detail-Spezifikation unten)*
 
+#### G. Audit & Change-Management (Changelog)
+- **AuditLog:** `LogID`, `UserID`, `Timestamp`, `ActionType` (STF_EXEC, SCHEMA_CHANGE), `RawInput`, `ChangesJSON` (Status Vorher/Nachher).
+- **SystemSnapshots:** Historisierte Versionen des DB-Schemas für Rollbacks der Creator-Aktionen.
+
 ### 2. Der "Smart-Transaction-Flow" (Logik-Ebene)
 Jede Anfrage durchläuft folgenden Prozess:
 1.  **Omnichannel-Input:** Sprachnachricht, Text-Prompt oder **Bilder** via Web-Frontend, WhatsApp, **MS Teams** oder Telegram.
@@ -98,6 +102,12 @@ Wenn der Creator das Schema oder die STFs verändert (z. B. neue Spalten hinzuf�
     *   **Guided Refactoring:** Anleitung zur manuellen Korrektur.
     *   **Rollback:** Sicherer Rückzug bei hohem Risiko.
 
+### 4. Audit & Time-Travel (Das "Ausagebügel-System")
+ChatERP ist darauf ausgelegt, dass Fehler (KI-Falschinterpretationen oder Fehlklicks) jederzeit korrigiert werden können:
+1.  **Immutability-Ansatz:** Daten werden vorzugsweise versioniert oder Änderungen im AuditLog so detailliert erfasst, dass eine exakte Gegen-Buchung möglich ist.
+2.  **Schema-Rollback:** Der Creator kann per Prompt (z. B. *"Mache die letzte Strukturänderung rückgängig"*) das Datenbank-Schema auf einen vorherigen Snapshot zurücksetzen.
+3.  **Transaction-Undo:** User können Aktionen per Sprache revidieren (z. B. *"Lösche meine letzte Zeiterfassung, das Projekt war falsch"*). Das System identifiziert die letzte Transaktion und führt den Rollback-Flow aus.
+
 ---
 
 ---
@@ -108,9 +118,9 @@ Wenn der Creator das Schema oder die STFs verändert (z. B. neue Spalten hinzuf�
 | :--- | :--- |
 | **Hosting & Cloud** | Azure App Service |
 | **Messaging / Bots** | **Azure Bot Service** (Connectivity für WhatsApp/Teams/Telegram) |
-| **Datenbank** | Azure SQL Database |
+| **Datenbank** | Azure SQL Database (**inkl. Temporal Tables** für native Historisierung) |
 | **KI / NLP / Speech** | Azure AI Foundry (Speech-to-Text, Azure OpenAI) |
-| **Logic-Engine** | Python (FastAPI / LangGraph für die STF-Steuerung) |
+| **Logic-Engine** | Python (FastAPI / LangGraph für die STF-Steuerung & **Rollback-Logik**) |
 | **Frontend** | Web-App (React / Vite) & Messaging-Clients |
 | **Output-Engine** | Module zur Erzeugung von DocX & automatisierten E-Mails |
 
