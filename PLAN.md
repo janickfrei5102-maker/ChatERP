@@ -15,16 +15,37 @@ Mitarbeiter im Feld (z. B. auf der Baustelle) bedienen das ERP per Sprachnachric
 
 ---
 
-## 🏛️ System-Architektur
-
 ### 1. Datenmodell (Azure SQL Database)
-Ein klassisches, robustes ERP-Schema umfasst:
-- **CRM:** Kunden, Firmen, Lieferanten & Interaktionshistorie.
-- **Finanzen:** Rechnungen & Belege.
-- **Warenwirtschaft:** Produkte, Produktgruppen & Lagerbestand.
-- **HR & Zeit:** Personalplanung, Rollen & **Zeit-Rapportierung** (Arbeitszeiterfassung, Projektabrechnung).
+Das Schema ist relational und auf Integrität ausgelegt. Es dient als Fundament für die kontextuelle Ableitung der STFs.
 
-### 2. Der "Smart-Transaction-Flow"
+#### A. Partners & CRM (Kunden, Lieferanten, Firmen)
+- **Entities:** `Organizations` (Firmen), `Contacts` (Personen), `Interactions` (Log).
+- **Key Fields:** `ID`, `Type` (Kunde/Lieferant), `Name`, `Address`, `VatID`, `IsActive`.
+- **CRM Log:** `InteractionID`, `ContactID`, `Type` (Anruf/Email/Besuch), `Summary`, `NextStep`.
+
+#### B. HR & Personalplanung (Basis für Context-Retrieval)
+- **Employees:** `EmployeeID`, `FirstName`, `LastName`, `Email`, `MessagingID` (WhatsApp/Telegram), `RoleID`.
+- **Roles:** `RoleID`, `RoleName` (Monteur, Backoffice, Chef), `PermissionsJSON`.
+- **DeploymentPlan (Einsatzplan):** `PlanID`, `EmployeeID`, `ProjectID`, `StartTime`, `EndTime`, `LocationDescription`. *Hieraus leitet das System ab, wo der Mitarbeiter gerade ist.*
+
+#### C. Warenwirtschaft (Produkte & Lager)
+- **ProductGroups:** `GroupID`, `Name` (z.B. Elektrotechnik, Sanitär).
+- **Products:** `ProductID`, `GroupID`, `SKU`, `Name`, `Description`, `Unit` (Stk, m, h), `BasePrice`.
+- **Inventory:** `ProductID`, `StockLevel`, `WarehouseLocation`, `LastRestockDate`.
+
+#### D. Projektmanagement & Zeit
+- **Projects:** `ProjectID`, `ClientID`, `Status` (Angebot, Aktiv, Abgeschlossen), `TotalBudget`, `ManagerID`.
+- **TimeLogs (Zeit-Rapportierung):** `LogID`, `EmployeeID`, `ProjectID`, `StartTime`, `EndTime`, `Description`, `IsBillable`.
+
+#### E. Finanzen
+- **Invoices:** `InvoiceID`, `ProjectID`, `IssueDate`, `DueDate`, `TotalAmount`, `Status` (Open, Paid, Overdue).
+- **InvoiceItems:** `InvoiceID`, `ProductID`, `Quantity`, `UnitPrice`.
+
+#### F. Media & Governance
+- **Attachments:** `AttachmentID`, `EntityID` (Link zu Projekt/Schaden), `BlobURL`, `MediaType` (Image/PDF), `OcrResultText`.
+- **SmartTransactionFlows (STF):** *(Siehe Detail-Spezifikation unten)*
+
+### 2. Der "Smart-Transaction-Flow" (Logik-Ebene)
 Jede Anfrage durchläuft folgenden Prozess:
 1.  **Omnichannel-Input:** Sprachnachricht, Text-Prompt oder **Bilder** via Web-Frontend, WhatsApp, **MS Teams** oder Telegram.
 2.  **Multimodale Analyse:** Whisper für Voice, Azure AI Vision für Bilder (OCR/Doku).
