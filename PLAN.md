@@ -50,8 +50,12 @@ Das Schema ist relational und auf Integrität ausgelegt. Es dient als Fundament 
 - **SystemSnapshots:** Historisierte Versionen des DB-Schemas für Rollbacks.
 
 #### H. Automation & Scheduling
-- **ScheduledFlows:** `FlowID`, `Name`, `Schedule` (Cron/Interval), `ActionJSON` (Welcher STF oder welche Prozedur soll laufen?), `IsActive`.
-- **ScheduledFlowLogs:** `RunID`, `FlowID`, `StartTime`, `EndTime`, `Status` (Success, Error), `OutputLink` (z. B. Link zu generierten Rechnungen).
+- **ScheduledFlows:** `FlowID`, `Name`, `Schedule`, `ActionJSON`, `IsActive`.
+- **ScheduledFlowLogs:** `RunID`, `FlowID`, `StartTime`, `EndTime`, `Status`, `OutputLink`.
+
+#### I. Tenant Settings & Branding (Firmen-Identität)
+- **TenantSettings:** `ID`, `CompanyName`, `Address`, `LegalInfo`, `LogoURL`, `PrimaryColor`, `PreferredFont`, `EmailSignature`. *Globaler Speicher für das Corporate Design.*
+- **DocSchemas (Template-DB):** `SchemaID`, `Name` (z. B. "Angebot_Modern"), `TargetFormat` (DocX/PDF), `TemplateURL`, `MappingJSON` (Platzhalter -> DB-Felder), `AIPromptPart` (Instruktion für generativen Textteil).
 
 ### 2. Der "Smart-Transaction-Flow" (Logik-Ebene)
 Jede Anfrage durchläuft folgenden Prozess:
@@ -124,6 +128,19 @@ Neben den interaktiven STFs verfügt ChatERP über eine Engine für zeitgesteuer
     *   **Dashboard:** In der Web-Oberfläche können alle terminierten Flows und deren Status (Erfolg/Fehler) eingesehen werden.
     *   **Benachrichtigung:** Bei kritischen Fehlern in einem Automated Flow wird der Creator proaktiv (z. B. via Teams/WhatsApp) informiert.
 4.  **Output:** Ähnlich wie STFs können diese Flows Daten in der DB ändern, Dokumente erzeugen oder Benachrichtigungen versenden.
+
+---
+
+## 📄 Generative Document Engine & Branding
+
+ChatERP erzeugt Dokumente nicht nur durch stumpfes Ersetzen von Text, sondern kombiniert klassische Vorlagen mit generativer Intelligenz:
+
+1.  **Template-Learning:** Der Creator lädt Beispiel-Dokumente (DocX/PDF) hoch. Das System extrahiert daraus das Layout und die Struktur für die **DocSchemas-Datenbank**.
+2.  **Hybrid-Generation:** 
+    *   **Fest:** Stammdaten (Name, Preis, Datum) werden präzise aus der DB gemappt.
+    *   **Generativ:** Textblöcke (z. B. Projektbeschreibungen oder persönliche Anschreiben) werden durch die KI passend zum Kontext verfasst.
+3.  **Branding-Injection:** Alle Dokumente nutzen automatisch die im **Tenant Settings** hinterlegten Infos (Logo, Anschrift, Schriftarten, Farben).
+4.  **Creation per Prompt:** Neue Dokumenten-Schemata können per Instruktion erstellt werden: *"Erstelle eine Vorlage für ein Abnahmeprotokoll, nimm das Logo oben rechts und füge eine Liste für Mängel hinzu."*
 
 ---
 
