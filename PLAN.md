@@ -140,7 +140,9 @@ ChatERP erzeugt Dokumente nicht nur durch stumpfes Ersetzen von Text, sondern ko
     *   **Fest:** Stammdaten (Name, Preis, Datum) werden präzise aus der DB gemappt.
     *   **Generativ:** Textblöcke (z. B. Projektbeschreibungen oder persönliche Anschreiben) werden durch die KI passend zum Kontext verfasst.
 3.  **Branding-Injection:** Alle Dokumente nutzen automatisch die im **Tenant Settings** hinterlegten Infos (Logo, Anschrift, Schriftarten, Farben).
-4.  **Creation per Prompt:** Neue Dokumenten-Schemata können per Instruktion erstellt werden: *"Erstelle eine Vorlage für ein Abnahmeprotokoll, nimm das Logo oben rechts und füge eine Liste für Mängel hinzu."*
+4.  **Creation & Refinement per Prompt:** 
+    *   **Initialisierung:** Neue Dokumenten-Schemata können per Instruktion oder Upload eines Beispiels erstellt werden.
+    *   **Iterative Verfeinerung:** Der Creator kann bestehende Schemata durch das Hochladen weiterer Beispiele oder gezielte Prompt-Anweisungen (z. B. *"Mache die Kopfzeile etwas kleiner und nutze für die Leistungsbeschreibung mehr Platz"*) kontinuierlich optimieren.
 
 ---
 
