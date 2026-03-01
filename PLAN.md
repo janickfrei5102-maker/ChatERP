@@ -46,8 +46,12 @@ Das Schema ist relational und auf Integrität ausgelegt. Es dient als Fundament 
 - **SmartTransactionFlows (STF):** *(Siehe Detail-Spezifikation unten)*
 
 #### G. Audit & Change-Management (Changelog)
-- **AuditLog:** `LogID`, `UserID`, `Timestamp`, `ActionType` (STF_EXEC, SCHEMA_CHANGE), `RawInput`, `ChangesJSON` (Status Vorher/Nachher).
-- **SystemSnapshots:** Historisierte Versionen des DB-Schemas für Rollbacks der Creator-Aktionen.
+- **AuditLog:** `LogID`, `UserID`, `Timestamp`, `ActionType` (STF_EXEC, SCHEMA_CHANGE, AUTO_FLOW), `RawInput`, `ChangesJSON`.
+- **SystemSnapshots:** Historisierte Versionen des DB-Schemas für Rollbacks.
+
+#### H. Automation & Scheduling
+- **ScheduledFlows:** `FlowID`, `Name`, `Schedule` (Cron/Interval), `ActionJSON` (Welcher STF oder welche Prozedur soll laufen?), `IsActive`.
+- **ScheduledFlowLogs:** `RunID`, `FlowID`, `StartTime`, `EndTime`, `Status` (Success, Error), `OutputLink` (z. B. Link zu generierten Rechnungen).
 
 ### 2. Der "Smart-Transaction-Flow" (Logik-Ebene)
 Jede Anfrage durchläuft folgenden Prozess:
@@ -110,6 +114,19 @@ ChatERP ist darauf ausgelegt, dass Fehler (KI-Falschinterpretationen oder Fehlkl
 
 ---
 
+## 🤖 Automated Flow Engine (Background Tasks)
+
+Neben den interaktiven STFs verfügt ChatERP über eine Engine für zeitgesteuerte Hintergrundprozesse:
+
+1.  **Zweck:** Automatisierung von Routineaufgaben ohne manuellen Prompt (z. B. tägliche Backup-Checks, monatliche Rechnungsläufe, wöchentliche Statusberichte).
+2.  **Definition per Sprache:** Der Creator kann Automated Flows per Prompt anlegen: *"Erstelle einen Flow, der jeden 1. des Monats alle abgeschlossenen Projekte abrechnet und die Rechnungen als PDF bereitstellt."*
+3.  **Monitoring & Kontrolle:**
+    *   **Dashboard:** In der Web-Oberfläche können alle terminierten Flows und deren Status (Erfolg/Fehler) eingesehen werden.
+    *   **Benachrichtigung:** Bei kritischen Fehlern in einem Automated Flow wird der Creator proaktiv (z. B. via Teams/WhatsApp) informiert.
+4.  **Output:** Ähnlich wie STFs können diese Flows Daten in der DB ändern, Dokumente erzeugen oder Benachrichtigungen versenden.
+
+---
+
 ---
 
 ## 🛠️ Technologie-Stack (Azure Cloud Native)
@@ -117,6 +134,7 @@ ChatERP ist darauf ausgelegt, dass Fehler (KI-Falschinterpretationen oder Fehlkl
 | Komponente | Technologie |
 | :--- | :--- |
 | **Hosting & Cloud** | Azure App Service |
+| **Automation / Jobs**| **Azure Functions** (für zeitgesteuerte Scheduled Flows) |
 | **Messaging / Bots** | **Azure Bot Service** (Connectivity für WhatsApp/Teams/Telegram) |
 | **Datenbank** | Azure SQL Database (**inkl. Temporal Tables** für native Historisierung) |
 | **KI / NLP / Speech** | Azure AI Foundry (Speech-to-Text, Azure OpenAI) |
