@@ -1,50 +1,76 @@
 # Projektplan: ChatERP 🚀
 
-ChatERP kombiniert moderne KI-Chat-Interfaces mit effizientem Enterprise Resource Planning (ERP). Ziel ist es, ERP-Daten (Lager, Verkauf, Kunden) intuitiv per natürlicher Sprache abzufragen und zu verwalten.
+**ChatERP** ist ein revolutionäres ERP-System für Kleinstunternehmen (z. B. Handwerksbetriebe bis ca. 10 Mitarbeiter), das vollständig über natürliche Sprache gesteuert wird. Statt komplexer Menüstrukturen steht ein einziger "Smart Prompt" im Zentrum, der sowohl Text- als auch Sprachnachrichten verarbeitet.
 
 ---
 
-## 📅 Roadmap & Meilensteine
+## 🏗️ Die Vision
+Mitarbeiter im Feld (z. B. auf der Baustelle) bedienen das ERP per Sprachnachricht in ihrer Muttersprache. Das System versteht die Instruktion, ordnet sie einem deterministischen Business-Case zu und führt die Transaktion sicher aus.
 
-### **Phase 1: Fundament (MVP)**
-- [ ] Requirements Engineering: Definition der Kern-Entitäten (Produkte, Kunden, Bestellungen).
-- [ ] Technologie-Stack festlegen (Favorit: Python/FastAPI + PostgreSQL + React/Next.js).
-- [ ] Datenbank-Schema entwerfen und initialisieren.
-- [ ] Basis-Backend für CRUD-Operationen (Erstellen, Lesen, Aktualisieren, Löschen).
-
-### **Phase 2: KI-Integration (Das "Chat" in ChatERP)**
-- [ ] Anbindung an ein LLM (z.B. OpenAI GPT-4, Anthropic Claude oder lokal via Ollama).
-- [ ] Entwicklung eines "Text-to-SQL" Moduls: Fragen wie *"Wie viele blaue T-Shirts sind noch auf Lager?"* übersetzen.
-- [ ] Aufbau einer Chat-Oberfläche (Frontend).
-
-### **Phase 3: Erweiterte ERP-Module**
-- [ ] Lagerverwaltung (Bestandsbuchungen, Lagerorte).
-- [ ] Auftragsmanagement (Angebot -> Auftrag -> Rechnung).
-- [ ] Dashboards & Analytik (Visuelle Auswertung der Daten).
-
-### **Phase 4: Automatisierung & Sicherheit**
-- [ ] Benutzerverwaltung & Rollen-Rechte-System.
-- [ ] Automatisierte Benachrichtigungen (z.B. bei niedrigem Lagerbestand).
-- [ ] API-Dokumentation für externe Anbindungen.
+### Kern-USP:
+- **Voice-First:** Primäre Interaktion über Sprachnachrichten (Transkription via Azure AI).
+- **Sprachunabhängig:** Nutzer sprechen in ihrer Muttersprache; das System verarbeitet die Absicht (Intent).
+- **Deterministische Sicherheit:** Keine "random" KI-Aktionen. Jeder Befehl wird einem vordefinierten Usecase zugeordnet.
+- **Rollen- & Strukturmodell:** Ein striktes Berechtigungssystem verhindert Fehlbedienungen oder das Löschen kritischer Daten.
 
 ---
 
-## 🛠️ Technologie-Stack (Vorschlag)
+## 🏛️ System-Architektur
 
-| Bereich | Technologie |
+### 1. Datenmodell (Azure SQL Database)
+Ein klassisches, robustes ERP-Schema umfasst:
+- **CRM:** Kunden, Firmen, Lieferanten & Interaktionshistorie.
+- **Finanzen:** Rechnungen & Belege.
+- **Warenwirtschaft:** Produkte, Produktgruppen & Lagerbestand.
+- **HR:** Personalplanung & Rollen.
+
+### 2. Der "Smart-Transaction-Flow"
+Jede Anfrage durchläuft folgenden Prozess:
+1.  **Input:** Sprachnachricht oder Text-Prompt via Web-Frontend.
+2.  **Transkription & Analyse:** Verarbeitung durch Azure AI Foundry Bausteine.
+3.  **Klassifizierung:** Zuordnung der Anfrage zu einem konkreten **Business Case**.
+4.  **Validierung (Security & Roles):** Prüfung der Zulässigkeit (Darf dieser User das tun?).
+5.  **Daten-Vervollständigung:** Identifikation fehlender Informationen (Rückfrage an den User, falls nötig).
+6.  **Ausführung:** Finale Transaktion (Datenanlage/Pflege) erst bei Vollständigkeit.
+
+### 3. Rollenkonzept
+- **User-Rolle:** Ausführung von zugewiesenen Business-Cases (z. B. "Material für Auftrag X verbuchen").
+- **Creator-Rolle:** Anpassung und Erstellung neuer Usecases – ebenfalls via Prompt-Interface.
+
+---
+
+## 🛠️ Technologie-Stack (Azure Cloud Native)
+
+| Komponente | Technologie |
 | :--- | :--- |
-| **Backend** | Python (FastAPI / Django) |
-| **Datenbank** | PostgreSQL |
-| **Frontend** | React (Vite / Next.js) |
-| **KI/LLM** | OpenAI API oder LangChain / LangGraph |
-| **Infrastruktur** | Docker |
+| **Hosting & Cloud** | Azure App Service |
+| **Datenbank** | Azure SQL Database |
+| **KI / NLP / Speech** | Azure AI Foundry (Speech-to-Text, Azure OpenAI) |
+| **Backend** | Python (FastAPI / LangGraph für deterministische Flows) |
+| **Frontend** | Web-App (React / Vite) mit nativen Audio-Web-APIs |
+| **Output-Engine** | Module zur Erzeugung von DocX & automatisierten E-Mails |
 
 ---
 
-## 📝 Nächste Schritte (Sofort-Aktionen)
-1. [ ] Entscheidung über den Tech-Stack treffen.
-2. [ ] Erstes Datenbank-Modell für "Produkte" entwerfen.
-3. [ ] Prototyp einer einfachen Chat-Schnittstelle bauen.
+## � Roadmap & Milestones
+
+### **Phase 1: Fundament (Azure Setup)**
+- [ ] Initialisierung der Azure SQL Datenbank mit dem ERP-Basisschema.
+- [ ] Setup des Backends mit Azure AI Foundry Integration.
+
+### **Phase 2: Text-to-Business-Case**
+- [ ] Entwicklung der Logik zur Intent-Klassifizierung.
+- [ ] Implementierung der ersten 3 Kern-Usecases (z. B. "Produkt anlegen", "Lager buchen", "Interaktion loggen").
+- [ ] Rollenmodell Prototyp.
+
+### **Phase 3: Voice-Interface & UI**
+- [ ] Web-Oberfläche mit Audio-Recording & Prompt-Input.
+- [ ] Integration der Azure Speech-to-Text Pipeline.
+
+### **Phase 4: Output & Creator Mode**
+- [ ] Dokumentenerstellung (DocX für Rechnungen/Angebote).
+- [ ] E-Mail-Automatisierung.
+- [ ] Implementierung der "Creator"-Rolle zur Usecase-Modifikation.
 
 ---
-*Dieser Plan wird kontinuierlich aktualisiert.*
+*Status: Initialer Entwurf basierend auf Zielgruppen-Analyse und Tech-Anforderungen.*
